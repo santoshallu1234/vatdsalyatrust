@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MYAPP",
-    "slug": "MYAPP",
+    "slug": "therapyapp",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "useNextNotificationsApi": true
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +32,18 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "2f2fe31f-b429-4ca0-bdbf-1db486e316fb",
+      },
+      "envar":{
+        "serverurl":"http://localhost:3000"
+      }
+    },
+    "envar":{
+        
+    },
+    "owner": "thedeveloper09"
   }
 }
