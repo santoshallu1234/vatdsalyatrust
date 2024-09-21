@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card } from 'react-native-paper';
-
+import Constants from 'expo-constants';
+const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
 const ResourcesScreen = () => {
   const resources = [
     { id: '1', title: 'Managing Stress', description: 'Tips and strategies for managing stress.' },

@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Switch, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import Constants from 'expo-constants';
+const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
 const SettingsScreen = () => {
   const navigation = useNavigation();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);

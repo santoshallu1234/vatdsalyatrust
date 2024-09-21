@@ -4,6 +4,9 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import axios from 'axios';
 import { router } from 'expo-router';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import LoginScreen from './login';
 //import axios from 'axios';
 const Home = () => {
 
@@ -14,8 +17,13 @@ const Home = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Signup2</Text>
 
-      {/* Username Input */}
-      
+      {/* Username Input 
+      <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={LoginScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+      */}
       <Link href={'/login'} style={styles.linktag}>login</Link>
       <Link href={'/signup'} style={styles.linktag}>signup</Link>
       <Link href={'/homescreen'} style={styles.linktag}>homescreen</Link>

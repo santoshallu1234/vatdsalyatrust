@@ -5,12 +5,17 @@ import { Avatar, Card } from 'react-native-paper';
 import axios from 'axios';
 import process from 'process';
 import Constants from 'expo-constants';
+import { useRouter } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
 //import { SERVER_URL } from '@env';
 const HomeScreen = () => {
   const navigation = useNavigation();
   const [therapists, setTherapists] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   // Fetch therapist data from API
   useEffect(() => {
@@ -20,6 +25,7 @@ const HomeScreen = () => {
         const response = await axios.get(`${SERVER}/gettherapist`); // Replace with your API endpoint
         if (response.data && Array.isArray(response.data)) {
           setTherapists(response.data);
+          console.log(response.data);
         } else {
           console.error('Unexpected response data format:', response.data);
         }
@@ -34,9 +40,26 @@ const HomeScreen = () => {
     fetchTherapists();
   }, []);
 
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const loggedIn = await AsyncStorage.getItem('isLoggedIn');
+      const storedUserId = await AsyncStorage.getItem('userId');
+      console.log(loggedIn,storedUserId);
+      if (loggedIn === 'true') {
+        setIsLoggedIn(true);
+        await setUserId(storedUserId);
+      } else {
+        navigation.navigate('/');
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
+
   // Render each therapist
   const renderTherapist = ({ item }) => (
-    <Card style={styles.card} key={item.id || Math.random().toString()}>
+    <Card style={styles.card} key={item._id || Math.random().toString()}>
       <View style={styles.cardContent}>
         <Avatar.Image size={60} source={{ uri: item.image || 'https://i.pravatar.cc/100' }} />
         <View style={styles.textContainer}>
@@ -57,13 +80,16 @@ const HomeScreen = () => {
           <View style={styles.buttonContainer}>
             <TouchableOpacity 
               style={styles.bookButton} 
-              onPress={() => navigation.navigate('inside/appointmentbook', { therapistId: item.id })}
+              onPress={() => router.push({
+                pathname: '/inside/appointmentbook',
+                params: { therapistId:item._id,name : item.name,userId:userId}
+              })}
             >
               <Text style={styles.buttonText}>Book Appointment</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.chatButton} 
-              onPress={() => navigation.navigate('Chat', { therapistId: item.id })}
+              onPress={() => navigation.navigate('Chat', { therapistId: item._id })}
             >
               <Text style={styles.buttonText}>Chat</Text>
             </TouchableOpacity>
@@ -84,7 +110,7 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Select a Therapist</Text>
+      <Text style={styles.title}>Select a Therapist {userId}</Text>
       <FlatList
         data={therapists}
         renderItem={renderTherapist}
@@ -92,6 +118,12 @@ const HomeScreen = () => {
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
       />
+          <TouchableOpacity 
+              style={styles.bookButton} 
+              onPress={() => router.push('/inside/appointhist')}
+            >
+              <Text style={styles.buttonText}>MY APPOINTMENTS</Text>
+            </TouchableOpacity>
     </View>
   );
 };

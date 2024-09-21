@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { Link } from 'expo-router';
 import Constants from 'expo-constants';
@@ -37,9 +38,11 @@ const LoginScreen = () => {
       });
 
       setLoading(false);
-
-      if (response.data.token) {
+       console.log(response.data.payload.userId);
+      if (response.data.payload) {
         Alert.alert('Success', 'Login successful');
+        await AsyncStorage.setItem('userId', response.data.payload.userId.toString());
+        await AsyncStorage.setItem('isLoggedIn', 'true');
         // Navigate to the home or dashboard after login
         router.replace('/'); // Adjust this based on your app's navigation structure
       } else {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
-
+import Constants from 'expo-constants';
+const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
 const EmergencyContactScreen = () => {
   const handleCall = (number) => {
     Linking.openURL(`tel:${number}`);

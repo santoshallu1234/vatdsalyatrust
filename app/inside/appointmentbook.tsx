@@ -1,20 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { useLocalSearchParams } from 'expo-router';
+import axios from 'axios';
+import { router } from 'expo-router';
+import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
+import DateTimePicker from '@react-native-community/datetimepicker';
 const AppointmentBookingScreen = () => {
-  const [selectedTherapist, setSelectedTherapist] = useState('');
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
 
-  const handleBook = () => {
-    // Handle booking logic
+  
+  // Access therapistId from route.params
+  const { therapistId,name} = useLocalSearchParams();
+  const [selectedTherapist, setSelectedTherapist] = useState(therapistId || ''); // Use therapistId from params if available
+  const [date, setDate] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState('');
+
+  const handleBook = async () => {
+    try {
+      const response = await axios.post(`${SERVER}/appoint`, {
+        therapistId: selectedTherapist,
+        date,
+        userId: userId,
+      });
+      console.log(response.data);
+      router.push('/inside/appointhist');
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  useEffect(() => {
+    console.log(therapistId);
+    console.log("hello");
+  }, []);
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const loggedIn = await AsyncStorage.getItem('isLoggedIn');
+      const storedUserId = await AsyncStorage.getItem('userId');
+      console.log(loggedIn,storedUserId);
+      if (loggedIn === 'true') {
+        setIsLoggedIn(true);
+        await setUserId(storedUserId);
+      } else {
+        navigation.navigate('/');
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Book an Appointment</Text>
+      <Text style={styles.title}>Book an Appointment {name}  {userId}</Text>
 
-      <Text style={styles.label}>Select Therapist</Text>
+      <Text style={styles.label}>Select Therapist{ selectedTherapist}</Text>
       <Picker
         selectedValue={selectedTherapist}
         onValueChange={(itemValue) => setSelectedTherapist(itemValue)}
@@ -30,14 +72,6 @@ const AppointmentBookingScreen = () => {
         value={date}
         onChangeText={(text) => setDate(text)}
         placeholder="YYYY-MM-DD"
-      />
-
-      <Text style={styles.label}>Select Time</Text>
-      <TextInput
-        style={styles.input}
-        value={time}
-        onChangeText={(text) => setTime(text)}
-        placeholder="HH:MM"
       />
 
       <Button title="Book Appointment" onPress={handleBook} />

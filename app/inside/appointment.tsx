@@ -3,7 +3,7 @@ import { View, Text, Button } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Notifications from 'expo-notifications';
 
-const AppointmentScreen = ({ route }) => {
+const AppointmentRemainder = ({ route }) => {
   //const { therapistId } = route.params;
   const { therapistId } = 'hunjmkmk';
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -38,4 +38,4 @@ const AppointmentScreen = ({ route }) => {
   );
 };
 
-export default AppointmentScreen;
+export default AppointmentRemainder;

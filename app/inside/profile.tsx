@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Avatar } from 'react-native-paper';
-
+import Constants from 'expo-constants';
+const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
 const UserProfileScreen = () => {
   const [profile, setProfile] = useState({
     name: 'John Doe',

@@ -4,6 +4,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Register a new user
+
+
+
 exports.register = async (req, res) => {
   const { name, email, password, role } = req.body;
     
@@ -17,7 +20,7 @@ exports.register = async (req, res) => {
     // Create JWT token
     const payload = { userId: user.id, role: user.role };
     console.log(payload)
-    const token = jwt.sign(payload, "sshnnnnnn", { expiresIn: '1h' });
+    //const token = jwt.sign(payload, "sshnnnnnn", { expiresIn: '1h' });
     res.status(201).json({ payload });
   } catch (error) {
     res.status(500).json({ msg: 'Server error' ,error:error});
@@ -39,9 +42,9 @@ exports.login = async (req, res) => {
     // Create JWT token
     const payload = { userId: user.id, role: user.role };
     console.log(payload);
-   const token = jwt.sign(payload, "sshnnnnnn", { expiresIn: '1h' });
-    console.log(token);
-    res.status(200).json({ token });
+  // const token = jwt.sign(payload, "sshnnnnnn", { expiresIn: '1h' });
+   // console.log(token);
+    res.status(200).json({ payload });
   } catch (error) {
     res.status(500).json({ msg: 'Server error' });
   }
@@ -49,8 +52,9 @@ exports.login = async (req, res) => {
 
 // Get user profile
 exports.getUserProfile = async (req, res) => {
+  console.log(req.body.userId);
   try {
-    const user = await User.findById(req.userId).select('-password');
+    const user = await User.findById(req.body.userId).select('-password');
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ msg: 'Server error' });
