@@ -15,10 +15,10 @@ const LoginScreen = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (name, value) => {
+  const handleChange = (name , value) => {
     setFormData({
       ...formData,
-      [name]: value,
+      [name] : value,
     });
   };
 
