@@ -1,23 +1,25 @@
-import { Link } from 'expo-router';
-import React, { useState ,useRef,useEffect} from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import * as Animatable from 'react-native-animatable';
+import { Ionicons } from '@expo/vector-icons'; // Icons for inputs
 import axios from 'axios';
-import { router } from 'expo-router';
 import Constants from 'expo-constants';
-const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
-//import axios from 'axios';
-const SignupScreen = () => {
+import { Link, router } from 'expo-router';
+import React, { useRef, useState } from 'react';
+import { Alert, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import favicon from '../../assets/images/favicon.png'; // Import image
 
+const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
+
+const SignupScreen = () => {
   const logoRef = useRef(null);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'user', // or 'therapist'
+    role: 'user',
   });
   const [loading, setLoading] = useState(false);
+  const [isRoleTherapist, setIsRoleTherapist] = useState(false); // For role toggle
 
   const handleChange = (name, value) => {
     setFormData({
@@ -28,7 +30,7 @@ const SignupScreen = () => {
 
   const handleSignup = async () => {
     const { username, email, password, confirmPassword, role } = formData;
-     console.log(username,email,password,role);
+
     if (password !== confirmPassword) {
       return Alert.alert('Error', 'Passwords do not match');
     }
@@ -39,19 +41,19 @@ const SignupScreen = () => {
 
     try {
       setLoading(true);
-     
-          const response = await axios.post(`${SERVER}/register`,{name:username,
-            email,
-            password,
-            role,}); // Replace with your API endpoint
-          console.log(response.data);
-          router.replace('/login');
+      const response = await axios.post(`${SERVER}/register`, {
+        name: username,
+        email,
+        password,
+        role,
+      });
+
+      console.log(response.data);
       setLoading(false);
 
       if (response.data.token) {
         Alert.alert('Success', 'Signup successful');
-        // Navigate to login or home screen after signup
-        navigation.navigate('Login'); // Adjust based on your navigation structure
+        router.replace('/login'); // Adjust based on your navigation structure
       }
     } catch (error) {
       setLoading(false);
@@ -59,73 +61,96 @@ const SignupScreen = () => {
       Alert.alert('Error', error.response?.data?.msg || 'Something went wrong');
     }
   };
-  
- /* const handleSignup = () => {
-    if (!formData.username || !formData.email || !formData.password) {
-      Alert.alert('Error', 'Please fill out all fields.');
-    } else if (!validateEmail(formData.email)) {
-      Alert.alert('Error', 'Please enter a valid email address.');
-    } else {
-      Alert.alert('Signup Success', `Welcome, ${formData.username}!`);
-      // Add signup logic, API call, or further validation here
-    }
-  };*/
 
   return (
     <View style={styles.container}>
-         <Animatable.Image
-        ref={logoRef}
-        source={{ uri: '../assets/images/favicon.png' }}  // Replace with your logo URL
+      <Text style={styles.registerText}>Hello! Register to get started</Text>
+      <Animatable.Image
+        /*ref={logoRef}
+        source={logo}
         style={styles.logo}
         animation="bounceIn"
-        duration={2000}
+        duration={2000}*/
       />
-      <Text style={styles.title}>Signup2</Text>
+      <Text style={styles.title}>Signup</Text>
 
-      {/* Username Input */}
-      <TextInput
-        placeholder="Name"
-        style={styles.input}
-        value={formData.name}
-        onChangeText={(text) => handleChange('username', text)}
-      />
-
-      {/* Email Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        keyboardType="email-address"
-        value={formData.email}
-        onChangeText={(text) =>   handleChange('email', text)}
-      />
-
-      {/* Password Input */}
-      <TextInput
-        placeholder="Password"
-        style={styles.input}
-        value={formData.password}
-        onChangeText={(text) => handleChange('password', text)}
-        secureTextEntry={true}
-      />
-      <TextInput
-        placeholder="Confirm Password"
-        style={styles.input}
-        value={formData.confirmPassword}
-        onChangeText={(text) => handleChange('confirmPassword', text)}
-        secureTextEntry={true}
-      />
-        <Button
-          title={formData.role === 'user' ? 'User' : 'Therapist'}
-          onPress={() => handleChange('role', formData.role === 'user' ? 'therapist' : 'user')}
+      {/* Username Input with Icon */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="person" size={24} color="#777" style={styles.inputIcon} />
+        <TextInput
+          placeholder="Name"
+          style={styles.input}
+          value={formData.username}
+          onChangeText={(text) => handleChange('username', text)}
         />
-     
-     <Button
-        title={loading ? 'Signing Up...' : 'Sign Up'}
+      </View>
+
+      {/* Email Input with Icon */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="mail" size={24} color="#777" style={styles.inputIcon} />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          keyboardType="email-address"
+          value={formData.email}
+          onChangeText={(text) => handleChange('email', text)}
+        />
+      </View>
+
+      {/* Password Input with Icon */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="lock-closed" size={24} color="#777" style={styles.inputIcon} />
+        <TextInput
+          placeholder="Password"
+          style={styles.input}
+          value={formData.password}
+          onChangeText={(text) => handleChange('password', text)}
+          secureTextEntry={true}
+        />
+      </View>
+
+      {/* Confirm Password Input with Icon */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="lock-closed" size={24} color="#777" style={styles.inputIcon} />
+        <TextInput
+          placeholder="Confirm Password"
+          style={styles.input}
+          value={formData.confirmPassword}
+          onChangeText={(text) => handleChange('confirmPassword', text)}
+          secureTextEntry={true}
+        />
+      </View>
+
+      {/* Role Switch */}
+      <View style={styles.roleSwitchContainer}>
+        <Text style={styles.roleText}>User</Text>
+        <Switch
+          value={isRoleTherapist}
+          onValueChange={(value) => {
+            setIsRoleTherapist(value);
+            handleChange('role', value ? 'therapist' : 'user');
+          }}
+          trackColor={{ false: '#767577', true: '#81b0ff' }}
+          thumbColor={isRoleTherapist ? '#007BFF' : '#f4f3f4'}
+        />
+        <Text style={styles.roleText}>Therapist</Text>
+      </View>
+
+      {/* Signup Button */}
+      <TouchableOpacity
+        style={[styles.signupButton, loading && styles.buttonDisabled]}
         onPress={handleSignup}
         disabled={loading}
-        color="#007BFF"
-      />
-      <Link href={'/login'} style={styles.linktag}>login</Link>
+      >
+        <Text style={styles.signupButtonText}>
+          {loading ? 'Signing Up...' : 'Sign Up'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Login Link */}
+      <Link href={'/login'} style={styles.linktag}>
+        Already have an account? Login
+      </Link>
     </View>
   );
 };
@@ -135,30 +160,84 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f9fa',
   },
-  title: {
-    fontSize: 24,
+  registerText: {
+    fontSize: 30,
     fontWeight: 'bold',
     textAlign: 'center',
+    color: '#333',
+    marginBottom: 30,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    alignSelf: 'center',
+    marginBottom: 40,
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#333',
     marginBottom: 20,
   },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
     borderWidth: 1,
+    borderColor: '#ccc',
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 2,
+    elevation: 3, // for Android shadow
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    height: 50,
     fontSize: 16,
   },
-  linktag:{
-    width:"100%",
-   textAlign:'center',
-   fontSize:15,
-   marginTop:10,
-  }
-  ,
+  roleSwitchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 15,
+  },
+  roleText: {
+    fontSize: 18,
+    fontWeight: '500',
+    marginHorizontal: 10,
+  },
+  signupButton: {
+    backgroundColor: '#5d4bdb',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  signupButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  buttonDisabled: {
+    backgroundColor: '#aaa',
+  },
+  linktag: {
+    width: '100%',
+    textAlign: 'center',
+    fontSize: 15,
+    marginTop: 10,
+    color: '#5d4bdb',
+  },
 });
 
 export default SignupScreen;

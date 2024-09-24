@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
 
 const AppointmentHistoryScreen = () => {
@@ -14,27 +15,11 @@ const AppointmentHistoryScreen = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-/*
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const response = await axios.get(`${SERVER}/userappoint`, { params: { userId: userId } });
-        setAppointments(response.data); // Assuming the response contains the appointment data
-      } catch (err) {
-        setError('Error fetching appointment data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, []);*/
 
   useEffect(() => {
     const checkLoginStatus = async () => {
       const loggedIn = await AsyncStorage.getItem('isLoggedIn');
       const storedUserId = await AsyncStorage.getItem('userId');
-      console.log(loggedIn,storedUserId);
       if (loggedIn === 'true') {
         setIsLoggedIn(true);
 
@@ -67,8 +52,7 @@ const AppointmentHistoryScreen = () => {
         <View style={styles.cardContent}>
           <View style={styles.leftSection}>
             <Text style={styles.date}>{item.date}</Text>
-            <Text style={styles.time}>{item.location}</Text>
-            {/* Assuming therapist has a 'name' property */}
+            <Text style={styles.location}>{item.location}</Text>
             <Text style={styles.therapist}>{item.therapist.name}</Text>
           </View>
           <View style={styles.rightSection}>
@@ -81,7 +65,7 @@ const AppointmentHistoryScreen = () => {
   );
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" style={styles.loading} />;
+    return <ActivityIndicator size="large" color="#5d4bdb" style={styles.loading} />;
   }
 
   if (error) {
@@ -94,8 +78,9 @@ const AppointmentHistoryScreen = () => {
       <FlatList
         data={appointments}
         renderItem={renderAppointment}
-        keyExtractor={(item) => item._id} // Changed keyExtractor to use _id if available
+        keyExtractor={(item) => item._id} 
         contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );
@@ -104,45 +89,45 @@ const AppointmentHistoryScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f1f5f9',
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+    backgroundColor: '#f0f0f0',
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 20,
+    textAlign: 'center',
     color: '#333',
+    marginBottom: 20,
   },
   card: {
     marginBottom: 15,
     borderRadius: 12,
-    backgroundColor: '#fff',
-    elevation: 5,
+    backgroundColor: '#ffffff',
+    padding: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowRadius: 5,
+    elevation: 5,
   },
   cardContent: {
     flexDirection: 'row',
-    padding: 15,
-    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   leftSection: {
     flex: 1,
-    justifyContent: 'center',
   },
   rightSection: {
-    flex: 2,
-    justifyContent: 'center',
+    flex: 1,
     alignItems: 'flex-end',
   },
   date: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontWeight: '600',
+    color: '#4b5563',
   },
-  time: {
+  location: {
     fontSize: 16,
     color: '#6b7280',
     marginBottom: 5,
@@ -153,25 +138,27 @@ const styles = StyleSheet.create({
   },
   status: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#10b981', // Green color for completed
+    fontWeight: '600',
+    color: '#10b981', // Green for status
   },
   notes: {
     fontSize: 14,
     color: '#9ca3af',
-    marginTop: 5,
     textAlign: 'right',
-  },
-  list: {
-    paddingBottom: 20,
   },
   loading: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   error: {
-    color: 'red',
     textAlign: 'center',
+    color: 'red',
+    fontSize: 16,
+    marginTop: 20,
+  },
+  list: {
+    paddingBottom: 20,
   },
 });
 

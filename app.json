@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MYAPP",
-    "slug": "therapyapp",
+    "slug": "therapyvatsalya",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,7 +13,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+      "NSCalendarsUsageDescription": "This app requires calendar access to create events."
+    }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,15 +38,13 @@
     },
     "extra": {
       "eas": {
-        "projectId": "2f2fe31f-b429-4ca0-bdbf-1db486e316fb",
+        "projectId": "fb74d34f-6381-4431-9382-892942be0225"
       },
-      "envar":{
-        "serverurl":"http://localhost:3000"
+      "envar": {
+        "serverurl": "http://localhost:3000"
       }
     },
-    "envar":{
-        
-    },
+    "envar": {},
     "owner": "thedeveloper09"
   }
 }

@@ -1,99 +1,83 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { Avatar, Card } from 'react-native-paper';
 import axios from 'axios';
-import process from 'process';
-import Constants from 'expo-constants';
-import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
+import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+
 const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
-//import { SERVER_URL } from '@env';
-const HomeScreen = () => {
+
+const TherapistScreen = () => {
   const navigation = useNavigation();
+  const router = useRouter();
   const [therapists, setTherapists] = useState([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userId, setUserId] = useState(null);
 
-  // Fetch therapist data from API
+  // Fetch therapist data
   useEffect(() => {
     const fetchTherapists = async () => {
       try {
-       
-        const response = await axios.get(`${SERVER}/gettherapist`); // Replace with your API endpoint
-        if (response.data && Array.isArray(response.data)) {
-          setTherapists(response.data);
-          console.log(response.data);
-        } else {
-          console.error('Unexpected response data format:', response.data);
-        }
+        const response = await axios.get(`${SERVER}/gettherapist`);
+        setTherapists(response.data || []);
       } catch (error) {
         console.error('Error fetching therapist data:', error);
-       
       } finally {
         setLoading(false);
       }
     };
-
     fetchTherapists();
   }, []);
 
+  // Check login status
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const loggedIn = await AsyncStorage.getItem('isLoggedIn');
       const storedUserId = await AsyncStorage.getItem('userId');
-      console.log(loggedIn,storedUserId);
-      if (loggedIn === 'true') {
-        setIsLoggedIn(true);
-        await setUserId(storedUserId);
-      } else {
+      setUserId(storedUserId);
+      if (!storedUserId) {
         navigation.navigate('/');
       }
     };
-
     checkLoginStatus();
   }, []);
 
+  const handleBookAppointment = (therapistId, therapistName) => {
+    router.push({
+      pathname: '/inside/appointmentbook',
+      params: { therapistId, name: therapistName, userId }
+    });
+  };
 
-  // Render each therapist
+  const renderAvailability = (availability) => {
+    if (!availability || availability.length === 0) {
+      return <Text style={styles.availabilityText}>No availability info</Text>;
+    }
+    return availability.map((slot, index) => (
+      <View key={index} style={styles.availabilityContainer}>
+        <Text>{slot.day}: {slot.timeSlots ? slot.timeSlots.join(', ') : 'No slots available'}</Text>
+      </View>
+    ));
+  };
+
   const renderTherapist = ({ item }) => (
-    <Card style={styles.card} key={item._id || Math.random().toString()}>
+    <Card style={styles.card}>
       <View style={styles.cardContent}>
-        <Avatar.Image size={60} source={{ uri: item.image || 'https://i.pravatar.cc/100' }} />
-        <View style={styles.textContainer}>
+      <Avatar.Image size={60} source={{ uri: `https://gravatar.com/avatar/${item.name.toLowerCase().replace(/\s+/g, '')}?d=identicon` }} />
+      <View style={styles.textContainer}>
           <Text style={styles.name}>{item.name || 'Unknown'}</Text>
-          <Text style={styles.specialization}>{item.specialization || 'Specialization not available'}</Text>
+          <Text style={styles.specialization}>{item.specialization || 'N/A'}</Text>
           <Text style={styles.experience}>Experience: {item.experience ? `${item.experience} years` : 'N/A'}</Text>
-          <View style={styles.availabilityContainer}>
-            {item.availability ? (
-              item.availability.map((slot, index) => (
-                <View key={`${item.id}-${index}`} style={styles.timeSlot}>
-                  <Text>{slot.day}: {slot.timeSlots ? slot.timeSlots.join(', ') : 'No slots available'}</Text>
-                </View>
-              ))
-            ) : (
-              <Text>No availability info</Text>
-            )}
+          <View style={styles.availabilityList}>
+            {renderAvailability(item.availability)}
           </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity 
-              style={styles.bookButton} 
-              onPress={() => router.push({
-                pathname: '/inside/appointmentbook',
-                params: { therapistId:item._id,name : item.name,userId:userId}
-              })}
-            >
-              <Text style={styles.buttonText}>Book Appointment</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.chatButton} 
-              onPress={() => navigation.navigate('Chat', { therapistId: item._id })}
-            >
-              <Text style={styles.buttonText}>Chat</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.bookButton}
+            onPress={() => handleBookAppointment(item._id, item.name)}
+          >
+            <Text style={styles.buttonText}>Book Appointment</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Card>
@@ -102,7 +86,7 @@ const HomeScreen = () => {
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#007BFF" />
+        <ActivityIndicator size="large" color="#5d4bdb" />
         <Text>Loading therapists...</Text>
       </View>
     );
@@ -110,20 +94,13 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Select a Therapist {userId}</Text>
+      <Text style={styles.title}>Select a Therapist</Text>
       <FlatList
         data={therapists}
         renderItem={renderTherapist}
-        keyExtractor={(item) => (item.id ? item.id.toString() : Math.random().toString())} // Ensure fallback key if id is missing
+        keyExtractor={(item) => item._id || Math.random().toString()}
         contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
       />
-          <TouchableOpacity 
-              style={styles.bookButton} 
-              onPress={() => router.push('/inside/appointhist')}
-            >
-              <Text style={styles.buttonText}>MY APPOINTMENTS</Text>
-            </TouchableOpacity>
     </View>
   );
 };
@@ -131,25 +108,24 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
     paddingHorizontal: 20,
-    paddingTop: 20,
+    backgroundColor: '#f0f0f0',
   },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 20,
     textAlign: 'center',
+    marginVertical: 20,
   },
   list: {
     paddingBottom: 30,
   },
   card: {
-    marginBottom: 15,
-    borderRadius: 10,
     backgroundColor: '#fff',
-    elevation: 5,
+    borderRadius: 15,
+    marginBottom: 20,
+    elevation: 4,
     padding: 15,
   },
   cardContent: {
@@ -173,41 +149,32 @@ const styles = StyleSheet.create({
   experience: {
     fontSize: 14,
     color: '#555',
-    marginVertical: 3,
+  },
+  availabilityList: {
+    marginTop: 10,
   },
   availabilityContainer: {
-    marginTop: 5,
-  },
-  timeSlot: {
-    fontSize: 12,
-    color: '#555',
     backgroundColor: '#e0f7fa',
     padding: 5,
     borderRadius: 5,
     marginVertical: 3,
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    marginTop: 10,
+  availabilityText: {
+    fontSize: 12,
+    color: '#555',
   },
   bookButton: {
-    backgroundColor: '#4CAF50',
+    marginTop: 10,
+    backgroundColor: '#5d4bdb',
     paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    marginRight: 10,
-  },
-  chatButton: {
-    backgroundColor: '#2196F3',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 14,
   },
   loaderContainer: {
     flex: 1,
@@ -216,4 +183,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default TherapistScreen;

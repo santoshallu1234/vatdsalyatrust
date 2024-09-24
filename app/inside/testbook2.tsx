@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams ,router} from 'expo-router';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,7 +9,8 @@ import DatePicker from '@react-native-community/datetimepicker';
 const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
 
 const AppointmentBookingScreen = () => {
-  const { therapistId, name } = useLocalSearchParams();
+  const therapistId = "dfghj";
+  const name = "yogi"
   const [selectedTherapist, setSelectedTherapist] = useState(therapistId || '');
   const [date, setDate] = useState(new Date());
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -17,20 +18,7 @@ const AppointmentBookingScreen = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false); // For showing a loader during API call
 
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      const loggedIn = await AsyncStorage.getItem('isLoggedIn');
-      const storedUserId = await AsyncStorage.getItem('userId');
-      if (loggedIn === 'true') {
-        setIsLoggedIn(true);
-        setUserId(storedUserId);
-      } else {
-        router.replace('/');
-      }
-    };
-    checkLoginStatus();
-  }, []);
-
+  
   const handleBook = async () => {
     if (!date || !selectedTherapist) {
       return Alert.alert('Error', 'Please select a date and therapist.');
@@ -73,18 +61,19 @@ const AppointmentBookingScreen = () => {
       </TouchableOpacity>
 
       {open && (
-        <DatePicker
-          modal
-          open={open}
-          date={date}
-          onConfirm={(selectedDate) => {
-            setOpen(false);
-            setDate(selectedDate);
-          }}
-          onCancel={() => setOpen(false)}
-          mode="date"
-        />
-      )}
+  <DatePicker
+    modal
+    open={open}
+    value={date}
+    minimumDate={new Date()} // Add this prop
+    onConfirm={(selectedDate) => {
+      setOpen(false);
+      setDate(selectedDate);
+    }}
+    onCancel={() => setOpen(false)}
+    mode="date"
+  />
+)}
 
       <TouchableOpacity
         style={styles.button}

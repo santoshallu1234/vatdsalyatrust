@@ -26,7 +26,7 @@ const Home = () => {
       */}
       <Link href={'/login'} style={styles.linktag}>login</Link>
       <Link href={'/signup'} style={styles.linktag}>signup</Link>
-      <Link href={'/homescreen'} style={styles.linktag}>homescreen</Link>
+      <Link href={'/inside/testbook2'} style={styles.linktag}>testbook</Link>
     </View>
   );
 };

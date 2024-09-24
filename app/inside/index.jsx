@@ -31,7 +31,7 @@ function App() {
         })}
       >
         <Tab.Screen name="Homescreen"  options={{ headerShown: false }}  component={HomeScreen} />
-        <Tab.Screen name="appointhistory" component={History} />
+        <Tab.Screen name="appointhistory" options={{ headerShown: false }}  component={History} />
       </Tab.Navigator>
   );
 }
