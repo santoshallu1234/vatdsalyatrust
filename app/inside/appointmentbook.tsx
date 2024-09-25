@@ -38,7 +38,7 @@ const AppointmentBookingScreen = () => {
     
     setLoading(true);
     try {
-      const response = await axios.post(`${SERVER}/appoint`, {
+      const response = await axios.post(`https://vatlaysabackend-production.up.railway.app/appoint`, {
         therapistId: selectedTherapist,
         date,
         userId,

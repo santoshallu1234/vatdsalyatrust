@@ -41,7 +41,7 @@ const SignupScreen = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(`${SERVER}/register`, {
+      const response = await axios.post(`https://vatlaysabackend-production.up.railway.app//register`, {
         name: username,
         email,
         password,

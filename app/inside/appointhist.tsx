@@ -25,7 +25,7 @@ const AppointmentHistoryScreen = () => {
 
         const fetchAppointments = async () => {
           try {
-            const response = await axios.get(`${SERVER}/userappoint`, { params: { userId: storedUserId } });
+            const response = await axios.get(`https://vatlaysabackend-production.up.railway.app/userappoint`, { params: { userId: storedUserId } });
             setAppointments(response.data); // Assuming the response contains the appointment data
           } catch (err) {
             setError('Error fetching appointment data');

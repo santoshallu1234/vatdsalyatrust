@@ -20,7 +20,7 @@ const TherapistScreen = () => {
   useEffect(() => {
     const fetchTherapists = async () => {
       try {
-        const response = await axios.get(`${SERVER}/gettherapist`);
+        const response = await axios.get(`https://vatlaysabackend-production.up.railway.app/gettherapist`);
         setTherapists(response.data || []);
       } catch (error) {
         console.error('Error fetching therapist data:', error);

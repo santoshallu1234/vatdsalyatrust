@@ -32,7 +32,8 @@ const LoginScreen = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post(`${SERVER}/login`, { email, password });
+
+      const response = await axios.post(`https://vatlaysabackend-production.up.railway.app/login`, { email, password });
       setLoading(false);
 
       if (response.data.payload) {
