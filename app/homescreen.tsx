@@ -94,12 +94,13 @@ const TherapistScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Select a Therapist</Text>
+      <Text style={styles.title}>Select a Therapist {userId}</Text>
       <FlatList
         data={therapists}
         renderItem={renderTherapist}
         keyExtractor={(item) => item._id || Math.random().toString()}
         contentContainerStyle={styles.list}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );

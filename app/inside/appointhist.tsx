@@ -22,7 +22,7 @@ const AppointmentHistoryScreen = () => {
       const storedUserId = await AsyncStorage.getItem('userId');
       if (loggedIn === 'true') {
         setIsLoggedIn(true);
-
+       // console.log(SERVER);
         const fetchAppointments = async () => {
           try {
             const response = await axios.get(`https://vatlaysabackend-production.up.railway.app/userappoint`, { params: { userId: storedUserId } });

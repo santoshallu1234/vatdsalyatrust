@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     color: 'black',
     marginBottom: 80,
     //textTransform: 'uppercase',
-    fontFamily: 'Cambria', // Change to your preferred font
+    //fontFamily: 'Cambria', // Change to your preferred font
   },
   logo: {
     width: 100,

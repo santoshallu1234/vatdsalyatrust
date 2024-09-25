@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, Button, StyleSheet, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
+import { useLocalSearchParams, router } from 'expo-router';
 import axios from 'axios';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DatePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from '@react-native-community/datetimepicker'; // Fixed import
 
 const SERVER = Constants.expoConfig?.extra?.envar?.serverurl;
 
@@ -14,8 +14,8 @@ const AppointmentBookingScreen = () => {
   const [date, setDate] = useState(new Date());
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userId, setUserId] = useState('');
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false); // For showing a loader during API call
+  const [showDatePicker, setShowDatePicker] = useState(false); // Changed `open` to `showDatePicker`
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -31,26 +31,48 @@ const AppointmentBookingScreen = () => {
     checkLoginStatus();
   }, []);
 
+  // New useEffect to watch for changes in the date
+  useEffect(() => {
+    console.log('Selected date has changed:', date.toDateString());
+  }, [date]);
+
   const handleBook = async () => {
     if (!date || !selectedTherapist) {
       return Alert.alert('Error', 'Please select a date and therapist.');
     }
-    
+
     setLoading(true);
-    try {
-      const response = await axios.post(`https://vatlaysabackend-production.up.railway.app/appoint`, {
-        therapistId: selectedTherapist,
-        date,
-        userId,
-      });
-      Alert.alert('Success', 'Appointment booked!');
-      router.push('/inside/appointhist');
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Failed to book the appointment');
-    } finally {
-      setLoading(false);
+    let attempts = 0;
+    const maxRetries = 3;
+
+    while (attempts < maxRetries) {
+      try {
+        const response = await axios.post(`https://vatlaysabackend-production.up.railway.app/appoint`, {
+          therapistId: selectedTherapist,
+          date,
+          userId,
+        });
+        Alert.alert('Success', 'Appointment booked!');
+        router.push('/inside/appointhist');
+        break; // Exit loop on success
+      } catch (error) {
+        attempts++;
+        console.error(error);
+        if (attempts >= maxRetries) {
+          Alert.alert('Error', 'Failed to book the appointment after multiple attempts');
+        } else {
+          await new Promise(res => setTimeout(res, 1000)); // Wait 1 second before retrying
+        }
+      } finally {
+        setLoading(false);
+      }
     }
+  };
+
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(Platform.OS === 'ios'); // Keep date picker open on iOS
+    setDate(currentDate); // Update date state
   };
 
   return (
@@ -68,21 +90,18 @@ const AppointmentBookingScreen = () => {
 
       <Text style={styles.label}>Selected Date: {date.toDateString()}</Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => setOpen(true)}>
+      <TouchableOpacity style={styles.button} onPress={() => setShowDatePicker(true)}>
         <Text style={styles.buttonText}>Select Date</Text>
       </TouchableOpacity>
 
-      {open && (
-        <DatePicker
-          modal
-          open={open}
-          date={date}
-          onConfirm={(selectedDate) => {
-            setOpen(false);
-            setDate(selectedDate);
-          }}
-          onCancel={() => setOpen(false)}
+      {/* DatePicker: Show only when the button is pressed */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}// Value must be a valid Date object
+          minimumDate={new Date()}  
           mode="date"
+          display="default"
+          onChange={handleDateChange} // Handle date changes
         />
       )}
 

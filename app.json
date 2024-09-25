@@ -41,7 +41,7 @@
         "projectId": "fb74d34f-6381-4431-9382-892942be0225"
       },
       "envar": {
-        "serverurl": "https://vatlaysabackend-production.up.railway.app/"
+        "serverurl": "https://vatlaysabackend-production.up.railway.app"
       }
     },
     "envar": {},
