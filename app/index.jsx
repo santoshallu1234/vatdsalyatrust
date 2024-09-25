@@ -1,32 +1,24 @@
 import { Link } from 'expo-router';
-import React, { useState ,useRef,useEffect} from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import axios from 'axios';
-import { router } from 'expo-router';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import LoginScreen from './login';
-//import axios from 'axios';
-const Home = () => {
+import React, { useState } from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
+//import favicon from '../../assets/images/favicon.png'; // Import the logo image
 
-  
+
+const Home = () => {
   const [loading, setLoading] = useState(false);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Signup2</Text>
+      <Image 
+        source={{ uri:'https://s.tmimgcdn.com/scr/800x500/143100/therapy-logo-template_143176-original.jpg'}} // Use the imported logo image
+        style={styles.logo}
+      />
+      <Text style={styles.title}>Vatsalya Trust Mumbai</Text>
 
-      {/* Username Input 
-      <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={LoginScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-      */}
-      <Link href={'/login'} style={styles.linktag}>login</Link>
-      <Link href={'/signup'} style={styles.linktag}>signup</Link>
-      <Link href={'/inside/testbook2'} style={styles.linktag}>testbook</Link>
+      <View style={styles.linkContainer}>
+        <Link href={'/login'} style={styles.linktag}>Login</Link>
+        <Link href={'/signup'} style={styles.linktag}>Sign Up</Link>
+      </View>
     </View>
   );
 };
@@ -35,31 +27,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 20,
     backgroundColor: '#fff',
+  },
+  logo: {
+    width: 200, // Adjust as needed
+    height: 200, // Adjust as needed
+    marginBottom: 100,
+    
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 50,
   },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
+  linkContainer: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  linktag: {
+    width: "90%",
+    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginTop: 20,
+    padding: 17,
+    backgroundColor: '#5d4bdb', // Example button color
+    color: '#fff',
     borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    fontSize: 16,
   },
-  linktag:{
-    width:"100%",
-   textAlign:'center',
-   fontSize:15,
-   marginTop:10,
-  }
-  ,
 });
 
 export default Home;

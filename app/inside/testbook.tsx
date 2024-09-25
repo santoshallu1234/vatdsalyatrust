@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Image, StyleSheet,Text } from 'react-native';
 import { FontAwesome ,AntDesign} from '@expo/vector-icons';
-import {Calendar} from 'react-native-calendars';
+
 const LocalImageExample = () => {
   return (
     <View style={styles.container}  className="flex-1 items-center justify-center bg-black">
